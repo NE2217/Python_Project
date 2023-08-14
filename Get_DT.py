@@ -1,8 +1,34 @@
 
 from datetime import datetime
+
+def f_makePackage(Data, DataSize):
+  step=Size=8*(DataSize+1)
+  leng=Data<<8
+  CRC=0
+
+  while step<=Size: 
+    if step == 8:
+      CRC=leng >> DataSize*8 
+      break 
+    else:  
+      if (leng >> (Size-1)) & 1 == 1:
+        leng=(leng << 1) ^ ((213+256) << (Size-8))
+      else:
+        leng=(leng << 1)
+    step=step-1
+    
+  Pac=[
+        ('{'),
+        Data.to_bytes(DataSize, 'big'), 
+        CRC.to_bytes(1, 'big'),  
+        ('}') 
+      ]
+      
+  return Pac
+   
+#def Func(data: int)->bool:
+
 now = datetime.now() 
-current_time = now.strftime("%H:%M:%S") 
-current_data = now.strftime("%d/%m/%Y")
 time=[ 
         int(now.strftime("%Y"))-2000,
         int(now.strftime("%m")),
@@ -15,14 +41,41 @@ time=[
         
 time_bt=[time[i].to_bytes(1, 'big') for i in range(7)]  
 
-print("Current Time =", current_time)
-print("Data =", current_data)
-
-print("send =",  time_bt)
 import serial
+ser = serial.Serial('COM3', 9600)   #init and open port
 
-ser = serial.Serial('COM3', 9600)
 for i in range(7):
-    ser.write(time_bt[i])    # write a string
+    ser.write(time_bt[i])           # write a string
 ser.write(b'\xFF')    
-ser.close()           # close port
+ser.close()                         # close port
+
+DataSize=1
+Data=123
+
+step=Size=8*(DataSize+1)
+leng=Data<<8
+
+'''
+print("Leng= ", str(leng))
+
+while step<=Size: 
+  if step == 8:
+    CRC=leng >> DataSize*8
+    print("CRC= ", str(CRC)) 
+    break 
+  else:  
+    if (leng >> (Size-1)) & 1 == 1:
+      leng=(leng << 1) ^ ((213+256) << (Size-8))
+      step=step-1
+      print("1S",str(step),"= ", str(Size)) 
+      print(" Leng= ", str(leng)) 
+    else:
+      leng=(leng << 1)
+      step=step-1
+      print("0S",str(step),"= ", str(Size))
+      print(" Leng= ", str(leng))  
+'''
+#PR=f_makePackage(time_bt, 7)
+
+#print ('pac=', str(PR))
+    
